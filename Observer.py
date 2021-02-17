@@ -1,8 +1,8 @@
 from statemachine import StateMachine, State
-#import SerialHandler
+# import SerialHandler
 import time
-#import statemachine
-#https://pypi.org/project/python-statemachine/
+# import statemachine
+# https://pypi.org/project/python-statemachine/
 
 class DeplasareMasina(StateMachine):
     initializare = State('initializare', initial=True)
@@ -10,33 +10,33 @@ class DeplasareMasina(StateMachine):
     #MergiInainteSiCautaParcare=State('MergiInainteSiCautaParcare')
     Opreste = State('Opreste')
     CurbaDreapta = State('IaCurbaDreapta')
-    ParcareLaterala= State('ParcheazaLaterala')
-    PlecareDinParcare=State('PleacaDinParcare')
-    CurbaStangaDupaStopActiune=State('CurbaStangaDupaStop')
+    ParcareLaterala = State('ParcheazaLaterala')
+    PlecareDinParcare = State('PleacaDinParcare')  # asta nu e tranzitie?
+    CurbaStangaDupaStopActiune = State('CurbaStangaDupaStop')
 
     PleacaDeLaStart = initializare.to(MergiInainte)
     stop = MergiInainte.to(Opreste)
     stoptodo = initializare.to(Opreste)
     PleacaDeLaStop = Opreste.to(MergiInainte)
-    CurbaStangaDupaStop=Opreste.to(CurbaStangaDupaStopActiune)
-    MergiInainteDupaStop=CurbaStangaDupaStopActiune.to(MergiInainte)
-    MergiLaDreapta=MergiInainte.to(CurbaDreapta)
-    MergiInainteDupaCurba=CurbaDreapta.to(MergiInainte)
+    CurbaStangaDupaStop = Opreste.to(CurbaStangaDupaStopActiune)
+    MergiInainteDupaStop = CurbaStangaDupaStopActiune.to(MergiInainte)
+    MergiLaDreapta = MergiInainte.to(CurbaDreapta)
+    MergiInainteDupaCurba = CurbaDreapta.to(MergiInainte)
 
-    Parcheaza=initializare.to(ParcareLaterala) #TODO: ar trebui in loc de initializare ceva de genu MergInainteDupaU
-    PleacaDinParcare=ParcareLaterala.to(PlecareDinParcare)
-    MergiInainteDupaParcare=PlecareDinParcare.to(MergiInainte)
+    Parcheaza = initializare.to(ParcareLaterala)  #TODO: ar trebui in loc de initializare ceva de genu MergInainteDupaU
+    PleacaDinParcare = ParcareLaterala.to(PlecareDinParcare)
+    MergiInainteDupaParcare = PlecareDinParcare.to(MergiInainte)
 
     def on_PleacaDeLaStart(self):
         print('Hai ca plecam')
-        #cautam stopul
+        # cautam stopul
 
     def on_stop(self):
         print('STOP.')
 
     def on_PleacaDeLaStop(self):
         print('GO GO GO!')
-        #cautam Drumul
+        # cautam Drumul
     def on_MergiLaDreapta(self):
         print('o luam la dreapta - sendMove()')
         #cautam Drumul

@@ -5,14 +5,14 @@ import numpy as np
 from DetectieBanda import Banda
 import DeseneazaBanda
 from Observer import DeplasareMasina
-#from StopAndPark import stopOrPark
+# from StopAndPark import stopOrPark
 
 cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)  # ('cameraE.avi')
-#cap.set(cv2.CAP_PROP_BUFFERSIZE, 2)
+# cap.set(cv2.CAP_PROP_BUFFERSIZE, 2)
 cap.set(3, 640)
 cap.set(4, 480)
 
-#THRESHOLD = 145
+# THRESHOLD = 145
 # global serialHandler
 ESTE_PE_MASINA = False  # <<-----
 VIDEO_RECORD = False
