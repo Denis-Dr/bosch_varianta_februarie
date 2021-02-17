@@ -4,6 +4,7 @@ import time
 # import statemachine
 # https://pypi.org/project/python-statemachine/
 
+
 class DeplasareMasina(StateMachine):
     initializare = State('initializare', initial=True)
     MergiInainte = State('MergiInainte')
@@ -39,7 +40,7 @@ class DeplasareMasina(StateMachine):
         # cautam Drumul
     def on_MergiLaDreapta(self):
         print('o luam la dreapta - sendMove()')
-        #cautam Drumul
+        # cautam Drumul
 
     def on_Parcheaza(self):
         global serialHandler
@@ -62,7 +63,7 @@ class DeplasareMasina(StateMachine):
             time.sleep(2.7)
         except:
             print("wtf - n")
-#cautam stopul
-#masina.stop()
-#masina.PleacaDeLaStop()
-#masina.
+# cautam stopul
+# masina.stop()
+# masina.PleacaDeLaStop()
+# masina.
