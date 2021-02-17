@@ -1,0 +1,6 @@
+# fisier constante
+
+NU_AM_GASIT = -1
+EROARE_ARTEFACT = 12
+EROARE_GROSIME_BANDA = 80
+
