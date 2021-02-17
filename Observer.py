@@ -1,4 +1,6 @@
 from statemachine import StateMachine, State
+import serial
+import cv2
 # import SerialHandler
 import time
 # import statemachine
@@ -6,34 +8,47 @@ import time
 
 
 class DeplasareMasina(StateMachine):
-    initializare = State('initializare', initial=True)
+    # STARILE
+    Initializare = State('Initializare', initial=True)
     MergiInainte = State('MergiInainte')
-    #MergiInainteSiCautaParcare=State('MergiInainteSiCautaParcare')
-    Opreste = State('Opreste')
+    Oprit = State('Oprit')
     CurbaDreapta = State('IaCurbaDreapta')
     ParcareLaterala = State('ParcheazaLaterala')
     PlecareDinParcare = State('PleacaDinParcare')  # asta nu e tranzitie?
     CurbaStangaDupaStopActiune = State('CurbaStangaDupaStop')
 
-    PleacaDeLaStart = initializare.to(MergiInainte)
-    stop = MergiInainte.to(Opreste)
-    stoptodo = initializare.to(Opreste)
-    PleacaDeLaStop = Opreste.to(MergiInainte)
-    CurbaStangaDupaStop = Opreste.to(CurbaStangaDupaStopActiune)
+    # TRANZITIILE
+    PleacaDeLaStart = Initializare.to(MergiInainte)
+    Opreste = MergiInainte.to(Oprit)
+    stoptodo = Initializare.to(Oprit)   # pt ce?
+    PleacaDeLaStop = Oprit.to(MergiInainte)
+    CurbaStangaDupaStop = Oprit.to(CurbaStangaDupaStopActiune)
     MergiInainteDupaStop = CurbaStangaDupaStopActiune.to(MergiInainte)
     MergiLaDreapta = MergiInainte.to(CurbaDreapta)
     MergiInainteDupaCurba = CurbaDreapta.to(MergiInainte)
 
-    Parcheaza = initializare.to(ParcareLaterala)  #TODO: ar trebui in loc de initializare ceva de genu MergInainteDupaU
+    Parcheaza = MergiInainte.to(ParcareLaterala)  # TODO: ar trebui in loc de Initializare ceva de genu MergInainteDupaU
     PleacaDinParcare = ParcareLaterala.to(PlecareDinParcare)
     MergiInainteDupaParcare = PlecareDinParcare.to(MergiInainte)
 
+    # STARILE
+    def on_Initializare(self):
+        print("Initializare...")
+        try:
+            print("da")
+        except:
+            print("nu")
+    # TODO: pt a verifica ce dispozitiv e conectat
+    #   trebuie creat obiect pt fiecare cu serial.Serial?,// dupa folosim del//??
+
+    # TRANZITIILE
     def on_PleacaDeLaStart(self):
         print('Hai ca plecam')
         # cautam stopul
 
-    def on_stop(self):
+    def on_Opreste(self):
         print('STOP.')
+        time.sleep(2.5)
 
     def on_PleacaDeLaStop(self):
         print('GO GO GO!')
@@ -45,7 +60,7 @@ class DeplasareMasina(StateMachine):
     def on_Parcheaza(self):
         global serialHandler
         serialHandler = SerialHandler.SerialHandler("/dev/ttyACM0")
-        try :
+        try:
             ## PARCARE STARE
             serialHandler.sendPidActivation(True)
             serialHandler.sendMove(-0.2, 22.0)
@@ -63,6 +78,7 @@ class DeplasareMasina(StateMachine):
             time.sleep(2.7)
         except:
             print("wtf - n")
+
 # cautam stopul
 # masina.stop()
 # masina.PleacaDeLaStop()
