@@ -8,47 +8,47 @@ global serialHandler
 
 class DeplasareMasina(StateMachine):
     # STARILE
-    Initializare = State('Initializare', initial=True)
-    MergiInainte = State('MergiInainte')
-    Oprit = State('Oprit')
-    CurbaStanga = State('IaCurbaStanga')
-    CurbaDreapta = State('IaCurbaDreapta')
-    ParcareLaterala = State('ParcheazaLaterala')
-    PlecareDinParcare = State('PleacaDinParcare')  # asta nu e tranzitie?
-    CurbaStangaDupaStopActiune = State('CurbaStangaDupaStop')
+    s_initiala = State('Initializare', initial=True)
+    s_mergi = State('Merge inainte')
+    s_oprit = State('Oprit')
+    s_inter = State('Intersectie')
+    s_inter_stanga = State('La stanga in intersectie')
+    s_inter_dreapta = State('La dreapta in intersectie')
+    s_inter_fata = State('In fata in intersectie')
+    s_parcatL = State('ParcheazaLaterala')
+    #CurbaStangaDupaStopActiune = State('CurbaStangaDupaStop')
 
     # TRANZITIILE
-    PleacaDeLaStart = Initializare.to(MergiInainte)
-    Opreste = MergiInainte.to(Oprit)
-    stoptodo = Initializare.to(Oprit)   # pt ce?
-    PleacaDeLaStop = Oprit.to(MergiInainte)
-    CurbaStangaDupaStop = Oprit.to(CurbaStangaDupaStopActiune)
-    MergiInainteDupaStop = CurbaStangaDupaStopActiune.to(MergiInainte)
-    MergiLaDreapta = MergiInainte.to(CurbaDreapta)
-    MergiInainteDupaCurba = CurbaDreapta.to(MergiInainte)
-### da
-    Parcheaza = MergiInainte.to(ParcareLaterala)
-    PleacaDinParcare = ParcareLaterala.to(PlecareDinParcare)
-    MergiInainteDupaParcare = PlecareDinParcare.to(MergiInainte)
+    t_start = s_initiala.to(s_mergi)
+    t_opreste = s_mergi.to(s_oprit)
+    t_porneste = s_oprit.to(s_mergi)
+    t_intra_inter = s_mergi.to(s_inter)
+    t_inter_la_dreapta = s_inter.to(s_inter_dreapta)
+    t_inter_la_stanga = s_inter.to(s_inter_stanga)
+    t_inter_la_fata = s_inter.to(s_inter_fata)
+    s_mergiDupaCurba = s_inter_dreapta.to(s_mergi)
+
+    Parcheaza = s_mergi.to(s_parcatL)
 
     # STARILE
-    def on_Initializare(self):
+    def on_s_initiala(self):
         print("Initializare...")
 
-    def on_MergiInainte(self):
+    def on_s_mergi(self):
         print("Merge inainte")
 
-    def on_Oprit(self):
+    def on_s_oprit(self):
         print("Oprit")
         time.sleep(2)
 
-    def on_CurbaDreapta(self):
-        print("Cruba la dreapta")
+    def on_s_inter_dreapta(self):
+        print("La dreapta in intersectie")
 
     def on_CurbaStanga(self):
         print("Curba la stanga")
 
-    def on_ParcareLaterala(self):
+
+    def on_s_parcatL(self):
         print("Parcata lateral")
         time.sleep(3)
 

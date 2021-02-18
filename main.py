@@ -4,7 +4,7 @@ import time
 import numpy as np
 from DetectieBanda import Banda
 import DeseneazaBanda
-from Observer import DeplasareMasina
+from Starile import DeplasareMasina
 # from StopAndPark import stopOrPark
 from PIDcontroller import PID
 
