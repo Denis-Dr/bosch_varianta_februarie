@@ -26,7 +26,7 @@ class DeplasareMasina(StateMachine):
     MergiInainteDupaStop = CurbaStangaDupaStopActiune.to(MergiInainte)
     MergiLaDreapta = MergiInainte.to(CurbaDreapta)
     MergiInainteDupaCurba = CurbaDreapta.to(MergiInainte)
-
+### da
     Parcheaza = MergiInainte.to(ParcareLaterala)
     PleacaDinParcare = ParcareLaterala.to(PlecareDinParcare)
     MergiInainteDupaParcare = PlecareDinParcare.to(MergiInainte)
