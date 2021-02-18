@@ -1,10 +1,9 @@
 from statemachine import StateMachine, State
-import serial
 import cv2
-# import SerialHandler
+import SerialHandler
 import time
-# import statemachine
-# https://pypi.org/project/python-statemachine/
+
+global serialHandler
 
 
 class DeplasareMasina(StateMachine):
@@ -12,6 +11,7 @@ class DeplasareMasina(StateMachine):
     Initializare = State('Initializare', initial=True)
     MergiInainte = State('MergiInainte')
     Oprit = State('Oprit')
+    CurbaStanga = State('IaCurbaStanga')
     CurbaDreapta = State('IaCurbaDreapta')
     ParcareLaterala = State('ParcheazaLaterala')
     PlecareDinParcare = State('PleacaDinParcare')  # asta nu e tranzitie?
@@ -27,59 +27,77 @@ class DeplasareMasina(StateMachine):
     MergiLaDreapta = MergiInainte.to(CurbaDreapta)
     MergiInainteDupaCurba = CurbaDreapta.to(MergiInainte)
 
-    Parcheaza = MergiInainte.to(ParcareLaterala)  # TODO: ar trebui in loc de Initializare ceva de genu MergInainteDupaU
+    Parcheaza = MergiInainte.to(ParcareLaterala)
     PleacaDinParcare = ParcareLaterala.to(PlecareDinParcare)
     MergiInainteDupaParcare = PlecareDinParcare.to(MergiInainte)
 
     # STARILE
     def on_Initializare(self):
         print("Initializare...")
-        try:
-            print("da")
-        except:
-            print("nu")
-    # TODO: pt a verifica ce dispozitiv e conectat
-    #   trebuie creat obiect pt fiecare cu serial.Serial?,// dupa folosim del//??
+
+    def on_MergiInainte(self):
+        print("Merge inainte")
+
+    def on_Oprit(self):
+        print("Oprit")
+        time.sleep(2)
+
+    def on_CurbaDreapta(self):
+        print("Cruba la dreapta")
+
+    def on_CurbaStanga(self):
+        print("Curba la stanga")
+
+    def on_ParcareLaterala(self):
+        print("Parcata lateral")
+        time.sleep(3)
+
+    def on_PlecareDinParcare(self):
+        print("Pleaca din parcare")
+
+    def on_CurbaStangaDupaStopActiune(self):
+        print("Curba stanga")
+
 
     # TRANZITIILE
     def on_PleacaDeLaStart(self):
-        print('Hai ca plecam')
+        print('Start')
+        try:
+            global serialHandler
+            serialHandler = SerialHandler.SerialHandler("/dev/ttyACM0")
+            camera_test = cv2.VideoCapture(0)
+        except serialHandler is None:
+            print("Eroare ACM")
+        except cv2.error:
+            print("Eroare Camera")
+
         # cautam stopul
 
     def on_Opreste(self):
-        print('STOP.')
+        print('Stop')
         time.sleep(2.5)
 
     def on_PleacaDeLaStop(self):
         print('GO GO GO!')
         # cautam Drumul
+
     def on_MergiLaDreapta(self):
         print('o luam la dreapta - sendMove()')
         # cautam Drumul
 
     def on_Parcheaza(self):
-        global serialHandler
+
+        serialHandler.sendPidActivation(True)
+        serialHandler.sendMove(-0.2, 22.0)
+        time.sleep(1)
+        serialHandler.sendMove(-0.2, -22.0)
+        time.sleep(1)
+        serialHandler.sendBrake(0.0)
+        time.sleep(2.5)
+
+    def on_PleacaDinParcare(self):
         serialHandler = SerialHandler.SerialHandler("/dev/ttyACM0")
-        try:
-            ## PARCARE STARE
-            serialHandler.sendPidActivation(True)
-            serialHandler.sendMove(-0.2, 22.0)
-            time.sleep(2.7)
-            serialHandler.sendMove(-0.2, -22.0)
-            time.sleep(2.5)
-            serialHandler.sendBrake(0.0)
-            time.sleep(2.5)
-            ### END OF PARCARE
-
-            ### START PLECARE DIN PARCARE
-            serialHandler.sendMove(0.2, -22.0)
-            time.sleep(2.2)
-            serialHandler.sendMove(0.2, 22.0)
-            time.sleep(2.7)
-        except:
-            print("wtf - n")
-
-# cautam stopul
-# masina.stop()
-# masina.PleacaDeLaStop()
-# masina.
+        serialHandler.sendMove(0.2, -22.0)
+        time.sleep(1)
+        serialHandler.sendMove(0.2, 22.0)
+        time.sleep(1)
