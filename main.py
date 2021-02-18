@@ -17,7 +17,6 @@ cap.set(3, 640)
 cap.set(4, 480)
 
 # THRESHOLD = 145
-# global serialHandler
 __ESTE_PE_MASINA__ = False  # <<-----
 VIDEO_RECORD = False
 
@@ -139,8 +138,6 @@ while True:
     # if intersectie == 1:
     # print("--> Urmeaza INTERSECTIE")
 
-    # fps = cap.get(cv2.CAP_PROP_FPS)
-
 
     DeseneazaBanda.PutLines(img, binarization, inaltimeCadru, lungimeCadru, inaltimeSectiuneSus, inaltimeSectiuneJos)
     DeseneazaBanda.deseneazaDrum(__PRINT_DATE__, img, centreSectiuniCompletat, centreSectiuni, centruRelativ, distantaFataDeAx, nrBenziDetectate, partea, inaltimeSectiuneSus, inaltimeSectiuneJos,
@@ -156,7 +153,6 @@ while True:
         current_error = abs(distantaFataDeAx)
         error = target_error - current_error
         correction = pid.Update(error)
-
         print("\n ## corr ", correction)
 
         if correction > 22 and distantaFataDeAx < 0:
@@ -182,56 +178,6 @@ while True:
     except Exception as e:
         print(e)
         pass
-    '''
-    try:
-        if nrBenziDetectate == 0:
-            serialHandler.sendMove(0.0, 0.0)
-            PRINT_DATE = False
-            continue
-
-        DiferentaFataDeMijloc = distantaFataDeAx
-        if DiferentaFataDeMijloc >= EroareCentrare:
-            pasAdaptare = pasAdaptare - 5
-            if DiferentaFataDeMijloc >= 2 * EroareCentrare:
-                pasAdaptare = pasAdaptare - 8
-            if (pasAdaptare < (-22)):
-                pasAdaptare = -22
-            if __ESTE_PE_MASINA__:
-                serialHandler.sendMove(0.165, pasAdaptare)
-                # print("<<<<")
-                # print("Unghi Adaptat pentru stanga: " + str(pasAdaptare))
-
-            cv2.putText(img, "O luam la stanga " + str(pasAdaptare), (10, 380),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
-        else:
-            if -EroareCentrare < DiferentaFataDeMijloc < EroareCentrare:
-                if __ESTE_PE_MASINA__:
-                    serialHandler.sendMove(0.165, 0.0)
-                    # print("suntem pe centru")
-                cv2.putText(img, "suntem pe centru", (10, 380),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
-                pasAdaptare = 0
-            else:
-                if DiferentaFataDeMijloc <= -EroareCentrare:
-                    pasAdaptare = pasAdaptare + 5
-                if DiferentaFataDeMijloc <= -2 * EroareCentrare:
-                    pasAdaptare = pasAdaptare + 8
-
-                cv2.putText(img, "O luam la dreapta " + str(pasAdaptare), (10, 380),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
-
-                if (pasAdaptare > (22)):
-                    pasAdaptare = 22
-
-                if __ESTE_PE_MASINA__:
-                    serialHandler.sendMove(0.165, 0.0 + pasAdaptare)
-                    # print(">>>>>>")
-                    # print("Unghi Adaptat pentru dreapta:\t" + str(pasAdaptare))
-
-    except Exception as e:
-        print(e)
-        pass
-    '''
 
     '''
     if (not __ESTE_PE_MASINA__) :

@@ -30,12 +30,12 @@ class PID:
         de = error - self.previous_error
 
         self.Cp = error
-        self.Ci += error * dt
-        self.Cd = de / dt
+        self.Ci += round(error * dt, 3)
+        self.Cd = round(de / dt, 3)  # AM ADAUGAT ROUND. POATE CALC MAI REPEDE
 
         self.previous_time = current_time
         self.previous_error = error
-        print ('\n\n',self.Cp, '\n',self.Ci, '\n',self.Ci )
+        print ('\n\n',self.Cp, '\n',self.Ci, '\n',self.Ci ,'\n time', dt)
         return (
             (self.Kp * self.Cp)    # proportional term
             + (self.Ki * self.Ci)  # integral term

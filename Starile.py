@@ -20,13 +20,17 @@ class DeplasareMasina(StateMachine):
 
     # TRANZITIILE
     t_start = s_initiala.to(s_mergi)
-    t_opreste = s_mergi.to(s_oprit)
-    t_porneste = s_oprit.to(s_mergi)
+    t_opreste = s_mergi.to(s_oprit)  # opreste la stop
+    t_porneste = s_oprit.to(s_mergi)  # porneste de la stop
     t_intra_inter = s_mergi.to(s_inter)
     t_inter_la_dreapta = s_inter.to(s_inter_dreapta)
     t_inter_la_stanga = s_inter.to(s_inter_stanga)
-    t_inter_la_fata = s_inter.to(s_inter_fata)
-    s_mergiDupaCurba = s_inter_dreapta.to(s_mergi)
+    t_inter_in_fata = s_inter.to(s_inter_fata)
+    s_mergiDupaCurba = s_inter_dreapta.to(s_mergi) # ?
+
+    t_iesi_inter_st = s_inter_stanga.to(s_mergi)
+    t_iesi_inter_fata = s_inter_fata.to(s_mergi)
+    t_iesi_inter_dr = s_inter_dreapta.to(s_mergi)
 
     Parcheaza = s_mergi.to(s_parcatL)
 
@@ -60,7 +64,7 @@ class DeplasareMasina(StateMachine):
 
 
     # TRANZITIILE
-    def on_PleacaDeLaStart(self):
+    def on_t_start(self):
         print('Start')
         try:
             global serialHandler
@@ -70,16 +74,60 @@ class DeplasareMasina(StateMachine):
             print("Eroare ACM")
         except cv2.error:
             print("Eroare Camera")
+        finally:
+            serialHandler.sendPidActivation(False)
+            serialHandler.close()
+            #camera_test.release()
+            cv2.destroyAllWindows()
 
         # cautam stopul
 
-    def on_Opreste(self):
+    def on_t_opreste(self):
         print('Stop')
-        time.sleep(2.5)
+        serialHandler.sendBrake(0.0)
+        time.sleep(3)
+        self.on_t_porneste(self)
 
-    def on_PleacaDeLaStop(self):
+    def on_t_porneste(self):
         print('GO GO GO!')
-        # cautam Drumul
+
+    def on_t_intra_inter(self, directie):
+        print("In intersectie")
+        '''
+        directie = 1  stanga
+        directie = 2  in fata
+        directie = 3  dreapta
+        '''
+        if directie == 1:
+            self.on_t_inter_la_stanga(self)
+        elif directie == 2:
+            self.on_t_inter_in_fata(self)
+        elif directie == 3:
+            self.ont_inter_la_dreapta(self)
+
+    def on_t_inter_la_stanga(self):
+        serialHandler.sendMove(0.19, -17)
+        time.sleep(1.9)
+        self.on_t_iesi_inter_st(self)
+
+    def on_t_inter_in_fata(self):
+        serialHandler.sendMove(0.18, 0)
+        time.sleep(1.2)
+
+    def on_t_inter_la_dreapta(self):
+        serialHandler.sendMove(0.19, 22)
+        time.sleep(1)
+
+    def on_t_iesi_inter_st(self):
+        print("A facut la stanga")
+
+    def on_t_iesi_inter_fata(self):
+        print("A mers in fata")
+
+    def on_t_iesi_inter_dr(self):
+        print("A faccut la dreapta")
+
+
 
     def on_MergiLaDreapta(self):
         print('o luam la dreapta - sendMove()')
