@@ -6,6 +6,10 @@ from DetectieBanda import Banda
 import DeseneazaBanda
 from Observer import DeplasareMasina
 # from StopAndPark import stopOrPark
+from PIDcontroller import PID
+
+pid = PID(0.22, 0, 0.1)
+target_error = 0
 
 cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)  # ('cameraE.avi')
 # cap.set(cv2.CAP_PROP_BUFFERSIZE, 2)
@@ -14,10 +18,10 @@ cap.set(4, 480)
 
 # THRESHOLD = 145
 # global serialHandler
-ESTE_PE_MASINA = False  # <<-----
+__ESTE_PE_MASINA__ = False  # <<-----
 VIDEO_RECORD = False
 
-if ESTE_PE_MASINA:
+if __ESTE_PE_MASINA__:
     serialHandler = SerialHandler.SerialHandler("/dev/ttyACM0")
     serialHandler.startReadThread()
 
@@ -70,13 +74,13 @@ while True:
         continue
     # if VIDEO_RECORD:
     #   out.write(frame)
-    # if not ESTE_PE_MASINA:
+    # if not __ESTE_PE_MASINA__:
     cv2.putText(img, "Cadrul: " + str(counter), (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.4,
                 (200, 255, 200), 2)
 
     gray = cv2.cvtColor(output, cv2.COLOR_BGR2GRAY)
     #ret, binarization = cv2.threshold(gray, THRESHOLD, 255, cv2.THRESH_BINARY)
-    binarization = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 17, -10)
+    binarization = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 45, -19)
 
     inaltimeCadru, lungimeCadru, _ = frame.shape  # H si L imagine
     MijlocCamera = int(lungimeCadru / 2.0)
@@ -121,10 +125,8 @@ while True:
 
     centreSectiuniCompletat = Sectiune.completareCentre(centreSectiuni, vectorLatimiMedii)
     vectorCentreMedii = Sectiune.calculCentreMedii(centreSectiuniCompletat)
-
     centruRelativ = Sectiune.calculCentruRelativ(vectorCentreMedii)
     distantaFataDeAx = Sectiune.calculDistantaFataDeAx(centruRelativ, MijlocCamera)
-
     nrBenziDetectate, partea = Sectiune.nrBenziDetectate()
 
     if __PRINT_DATE__:
@@ -144,12 +146,43 @@ while True:
     DeseneazaBanda.deseneazaDrum(__PRINT_DATE__, img, centreSectiuniCompletat, centreSectiuni, centruRelativ, distantaFataDeAx, nrBenziDetectate, partea, inaltimeSectiuneSus, inaltimeSectiuneJos,
                             vectorCentreMedii, intersectie, inaltimeCadru, lungimeCadru)  # inFunctiune
 
-    if DEBUG_ALL_DATA and ESTE_PE_MASINA:
+    if DEBUG_ALL_DATA and __ESTE_PE_MASINA__:
         print("Benzi gasite:" + str(Sectiune.nrBenziDetectate()))
         print("\nCentre:\t" + str(Sectiune.centreSectiuni))
     else:
         cv2.putText(img, "Benzi identificate: " + str(Sectiune.nrBenziDetectate()), (10, 460), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
 
+    try:
+        current_error = abs(distantaFataDeAx)
+        error = target_error - current_error
+        correction = pid.Update(error)
+
+        print("\n ## corr ", correction)
+
+        if correction > 22 and distantaFataDeAx < 0:
+            correction = 22
+        elif correction > 22 and distantaFataDeAx > 0:
+            correction = -22
+
+        if correction < -22 and distantaFataDeAx < 0:
+            correction = 22
+        elif correction < -22 and distantaFataDeAx > 0:
+            correction = -22
+
+        if -22 <= correction <= 0 and distantaFataDeAx < 0:
+            correction = -correction
+        elif 0 <= correction <= 22 and distantaFataDeAx > 0:
+            correction = -correction
+
+        if __ESTE_PE_MASINA__:
+            serialHandler.sendMove(0.165, int(correction))
+
+        print("corrention  ", int(correction), "   distAX" ,distantaFataDeAx)
+
+    except Exception as e:
+        print(e)
+        pass
+    '''
     try:
         if nrBenziDetectate == 0:
             serialHandler.sendMove(0.0, 0.0)
@@ -163,7 +196,7 @@ while True:
                 pasAdaptare = pasAdaptare - 8
             if (pasAdaptare < (-22)):
                 pasAdaptare = -22
-            if ESTE_PE_MASINA:
+            if __ESTE_PE_MASINA__:
                 serialHandler.sendMove(0.165, pasAdaptare)
                 # print("<<<<")
                 # print("Unghi Adaptat pentru stanga: " + str(pasAdaptare))
@@ -172,7 +205,7 @@ while True:
                         cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
         else:
             if -EroareCentrare < DiferentaFataDeMijloc < EroareCentrare:
-                if ESTE_PE_MASINA:
+                if __ESTE_PE_MASINA__:
                     serialHandler.sendMove(0.165, 0.0)
                     # print("suntem pe centru")
                 cv2.putText(img, "suntem pe centru", (10, 380),
@@ -190,7 +223,7 @@ while True:
                 if (pasAdaptare > (22)):
                     pasAdaptare = 22
 
-                if ESTE_PE_MASINA:
+                if __ESTE_PE_MASINA__:
                     serialHandler.sendMove(0.165, 0.0 + pasAdaptare)
                     # print(">>>>>>")
                     # print("Unghi Adaptat pentru dreapta:\t" + str(pasAdaptare))
@@ -198,19 +231,20 @@ while True:
     except Exception as e:
         print(e)
         pass
+    '''
 
     '''
-    if (not ESTE_PE_MASINA) :
+    if (not __ESTE_PE_MASINA__) :
         cv2.putText(img, "Stare: " + str(masina.current_state.value), (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.4,
                     (250, 250, 250), 2)
     else :
         print(masina.current_state.value)
     '''
 
-    if (not ESTE_PE_MASINA) and __AFISARE_VIDEO__:
+    if __AFISARE_VIDEO__:
         # cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
         # cv2.resizeWindow('frame', 960, 720)
-        cv2.imshow("frame", frame)
+        #cv2.imshow("frame", frame)
 
         # cv2.namedWindow('Img_procesata', cv2.WINDOW_NORMAL)
         # cv2.resizeWindow('Img_procesata', 960, 720)
@@ -220,14 +254,13 @@ while True:
         # cv2.resizeWindow('binarizare', 960, 720)
         cv2.imshow("binarizare", binarization)
 
-    cv2.waitKey(1)  # 1=readare automata // 0=redare la buton
-
-
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    key = cv2.waitKey(1)  # 1=readare automata // 0=redare la buton
+    if key==ord('q'): #cv2.waitKey(1) & 0xFF == ord('q'):
+        if __ESTE_PE_MASINA__:
+            serialHandler.sendBrake(0.0)
         break
 
-
-if ESTE_PE_MASINA:
+if __ESTE_PE_MASINA__:
     serialHandler.sendPidActivation(False)
     serialHandler.close()
 
