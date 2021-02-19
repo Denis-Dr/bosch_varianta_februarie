@@ -13,7 +13,7 @@ pid = PID(0.22, 0, 0.1)
 target_error = 0
 viteza_pwm = 0.19
 
-cap = cv2.VideoCapture(0) #, cv2.CAP_DSHOW)  # ('cameraE.avi')
+cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)  # ('cameraE.avi')
 # cap.set(cv2.CAP_PROP_BUFFERSIZE, 2)
 cap.set(3, 640)
 cap.set(4, 480)

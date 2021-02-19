@@ -1,6 +1,9 @@
 import time
 # https://github.com/korfuri/PIDController
 
+def truncate(nr):
+    return int(nr*1000) / 1000
+
 class PID:
     """PID controller."""
 
@@ -24,14 +27,14 @@ class PID:
     def Update(self, error, current_time=None):
         if current_time is None:
             current_time = time.time()
-        dt = current_time - self.previous_time
+        dt = truncate(current_time - self.previous_time)
         if dt <= 0.0:
             return 0
         de = error - self.previous_error
 
         self.Cp = error
-        self.Ci += round(error * dt, 3)
-        self.Cd = round(de / dt, 3)  # AM ADAUGAT ROUND. POATE CALC MAI REPEDE
+        self.Ci += truncate(error * dt)
+        self.Cd = truncate(de / dt)
 
         self.previous_time = current_time
         self.previous_error = error
