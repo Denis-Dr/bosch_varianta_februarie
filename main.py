@@ -8,15 +8,17 @@ from Starile import DeplasareMasina
 # from StopAndPark import stopOrPark
 from PIDcontroller import PID
 
+stare = DeplasareMasina()
 pid = PID(0.22, 0, 0.1)
 target_error = 0
+viteza_pwm = 0.19
 
-cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)  # ('cameraE.avi')
+cap = cv2.VideoCapture(0) #, cv2.CAP_DSHOW)  # ('cameraE.avi')
 # cap.set(cv2.CAP_PROP_BUFFERSIZE, 2)
 cap.set(3, 640)
 cap.set(4, 480)
 
-# THRESHOLD = 145
+THRESHOLD = 180
 __ESTE_PE_MASINA__ = False  # <<-----
 VIDEO_RECORD = False
 
@@ -171,7 +173,10 @@ while True:
             correction = -correction
 
         if __ESTE_PE_MASINA__:
-            serialHandler.sendMove(0.165, int(correction))
+            if intersectie == 0:
+                serialHandler.sendMove(viteza_pwm, int(correction))
+            else:
+                stare.on_t_intra_inter(1)
 
         print("corrention  ", int(correction), "   distAX" ,distantaFataDeAx)
 

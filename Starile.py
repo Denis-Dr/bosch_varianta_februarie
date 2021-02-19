@@ -107,7 +107,7 @@ class DeplasareMasina(StateMachine):
 
     def on_t_inter_la_stanga(self):
         serialHandler.sendMove(0.19, -17)
-        time.sleep(1.9)
+        time.sleep(7)
         self.on_t_iesi_inter_st(self)
 
     def on_t_inter_in_fata(self):
