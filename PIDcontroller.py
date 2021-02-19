@@ -28,18 +28,20 @@ class PID:
         if current_time is None:
             current_time = time.time()
         dt = truncate(current_time - self.previous_time)
+
         if dt <= 0.0:
             return 0
         de = error - self.previous_error
 
         self.Cp = error
         self.Ci += truncate(error * dt)
+        self.Ci = truncate(self.Ci)
         self.Cd = truncate(de / dt)
 
         self.previous_time = current_time
         self.previous_error = error
-        print ('\n\n',self.Cp, '\n',self.Ci, '\n',self.Ci ,'\n time', dt)
-        return (
+        print ('\n',self.Cp, '\n',self.Ci, '\n',self.Ci ,'\n time', dt)
+        return int(
             (self.Kp * self.Cp)    # proportional term
             + (self.Ki * self.Ci)  # integral term
             + (self.Kd * self.Cd)  # derivative term

@@ -9,7 +9,7 @@ from Starile import DeplasareMasina
 from PIDcontroller import PID
 
 stare = DeplasareMasina()
-pid = PID(0.22, 0, 0.1)
+pid = PID(0.15, 0, 0.1)
 target_error = 0
 viteza_pwm = 0.19
 
