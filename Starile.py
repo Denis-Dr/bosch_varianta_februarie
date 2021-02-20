@@ -103,20 +103,28 @@ class DeplasareMasina(StateMachine):
         elif directie == 2:
             self.on_t_inter_in_fata(self)
         elif directie == 3:
-            self.ont_inter_la_dreapta(self)
+            self.on_t_inter_la_dreapta(self)
 
     def on_t_inter_la_stanga(self):
+        serialHandler.sendBrake(0.0)
+        time.sleep(1.2)
         serialHandler.sendMove(0.19, -17)
         time.sleep(7)
         self.on_t_iesi_inter_st(self)
 
     def on_t_inter_in_fata(self):
-        serialHandler.sendMove(0.18, 0)
+        serialHandler.sendBrake(0.0)
         time.sleep(1.2)
+        serialHandler.sendMove(0.18, 0.0)
+        time.sleep(3.0)
+        self.on_t_iesi_inter_fata(self)
 
     def on_t_inter_la_dreapta(self):
-        serialHandler.sendMove(0.19, 22)
-        time.sleep(1)
+        serialHandler.sendBrake(0.0)
+        time.sleep(1.2)
+        serialHandler.sendMove(0.185, 20)
+        time.sleep(2.7)
+        self.on_t_iesi_inter_dr(self)
 
     def on_t_iesi_inter_st(self):
         print("A facut la stanga")
