@@ -7,16 +7,27 @@ import DeseneazaBanda
 from Starile import DeplasareMasina
 # from StopAndPark import stopOrPark
 from PIDcontroller import PID
+from cameraHandler import VideoStream, VideoShow
+
+__AFISARE_VIDEO__ = True
 
 stare = DeplasareMasina()
 pid = PID(0.22, 0, 0.1)
 target_error = 0
 viteza_pwm = 0.182
 
-cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)  # ('cameraE.avi')
+capture = VideoStream(PiOrUSB=2, framerate=30, driverWindows=cv2.CAP_DSHOW).start()
+
+#video_getter = VideoGet(0).start()  # comanda pt Raspberry
+#video_getter = VideoGet(src=0, driver=cv2.CAP_DSHOW).start()  # driver este pt Windows ca sa porneasca mai repede camera
+if __AFISARE_VIDEO__ == True:
+    video_shower_img = VideoShow(capture.read(), "Img").start()
+   # video_shower_binarization = VideoShow(video_getter.frame, "Binarization").start()  nu merge la afisare
+
+#cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)  # ('cameraE.avi')
 # cap.set(cv2.CAP_PROP_BUFFERSIZE, 2)
-cap.set(3, 640)
-cap.set(4, 480)
+#cap.set(3, 640)
+#cap.set(4, 480)
 
 THRESHOLD = 180
 __ESTE_PE_MASINA__ = False  # <<-----
@@ -33,7 +44,7 @@ if VIDEO_RECORD:
 DEBUG_ALL_DATA = False
 AMPARCAT = False
 __PRINT_DATE__ = False
-__AFISARE_VIDEO__ = True
+
 
 ## VARIABILE
 latimeSus = np.zeros(0)
@@ -57,10 +68,22 @@ contorDistMedBenzi0 = 0  # calculam distanda medie intre benzi
 contorDistMedBenzi1 = 0
 
 while True:
+    t1 = time.time()
+    '''
+    if video_getter.stopped:
+        video_getter.stop()
+        break
+    if __AFISARE_VIDEO__ == True:
+        if video_shower_img.stopped:
+            video_shower_img.stop()
+            break
+    '''
+    frame = capture.read()
+    '''
     ret, frame = cap.read()
     if ret is False:
         break
-
+    '''
     if VIDEO_RECORD:
         out.write(frame)
 
@@ -192,18 +215,21 @@ while True:
         print(masina.current_state.value)
     '''
 
-    if __AFISARE_VIDEO__:
+    if __AFISARE_VIDEO__ == True:
+        video_shower_img.frame = img
+        # video_shower_binarization = binarization  nu merge
+
         # cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
         # cv2.resizeWindow('frame', 960, 720)
         #cv2.imshow("frame", frame)
 
         # cv2.namedWindow('Img_procesata', cv2.WINDOW_NORMAL)
         # cv2.resizeWindow('Img_procesata', 960, 720)
-        cv2.imshow("Img_procesata", img)
+        #cv2.imshow("Img_procesata", img)
 
         # cv2.namedWindow('binarizare', cv2.WINDOW_NORMAL)
         # cv2.resizeWindow('binarizare', 960, 720)
-        cv2.imshow("binarizare", binarization)
+        #cv2.imshow("binarizare", binarization)
 
     key = cv2.waitKey(1)  # 1=readare automata // 0=redare la buton
     if key==ord('q'): #cv2.waitKey(1) & 0xFF == ord('q'):
@@ -211,9 +237,11 @@ while True:
             serialHandler.sendBrake(0.0)
         break
 
+    print("** dT ", time.time()-t1)
 if __ESTE_PE_MASINA__:
     serialHandler.sendPidActivation(False)
     serialHandler.close()
 
-cap.release()
+#cap.release()
 cv2.destroyAllWindows()
+capture.stop()

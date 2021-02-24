@@ -257,8 +257,35 @@ def main():
         ##END OF PLECARE
 
         # mers inainte
-        serialHandler.sendMove(15, 10)
-        time.sleep(2.2)
+        serialHandler.sendMove(0, 0)
+        time.sleep(0.2)
+        serialHandler.sendMove(0.20, 0)
+        time.sleep(2.0)
+
+        serialHandler.sendMove(0.21, -20)
+        time.sleep(2.0)
+
+        serialHandler.sendMove(0.20, 0)
+        time.sleep(0.6)
+
+        serialHandler.sendMove(0.21, -21)
+        time.sleep(2.45)
+
+        serialHandler.sendMove(0.20, 0)
+        time.sleep(1.5)
+
+        serialHandler.sendMove(0.21, -20)
+        time.sleep(2.0)
+
+        serialHandler.sendMove(0.20, 0)
+        time.sleep(0.6)
+
+        serialHandler.sendMove(0.21, -20)
+        time.sleep(2.0)
+
+        serialHandler.sendMove(0.20, 0)
+        time.sleep(1.0)
+
         serialHandler.sendMove(0, 0)
         time.sleep(2.7)
 
