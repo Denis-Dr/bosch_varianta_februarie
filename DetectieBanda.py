@@ -116,10 +116,10 @@ class Banda:
                     else:
                         break
 
-        self.t1 = Thread(target=f1)
-        self.t2 = Thread(target=f2)
-        self.t3 = Thread(target=f3)
-        self.t4 = Thread(target=f4)
+        self.t1 = Thread(target=f1,daemon=True)
+        self.t2 = Thread(target=f2,daemon=True)
+        self.t3 = Thread(target=f3,daemon=True)
+        self.t4 = Thread(target=f4,daemon=True)
         self.t1.start()
         self.t2.start()
         self.t3.start()

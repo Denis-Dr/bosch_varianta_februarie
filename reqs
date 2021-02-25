@@ -2,7 +2,7 @@ numpy==1.19.1
 python_statemachine==0.8.0
 opencv_python==4.3.0.36
 imutils==0.5.3
-Flask==1.1.2
+Flask==1.1.2p
 flask_opencv_streamer==1.4
 picamera==1.13
 Pillow==7.2.0

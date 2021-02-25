@@ -16,7 +16,7 @@ pid = PID(0.22, 0, 0.1)
 target_error = 0
 viteza_pwm = 0.182
 
-capture = VideoStream(PiOrUSB=2, framerate=30, driverWindows=cv2.CAP_DSHOW).start()
+capture = VideoStream(PiOrUSB=2, framerate=30, driverWindows=cv2.CAP_GSTREAMER).start()
 
 #video_getter = VideoGet(0).start()  # comanda pt Raspberry
 #video_getter = VideoGet(src=0, driver=cv2.CAP_DSHOW).start()  # driver este pt Windows ca sa porneasca mai repede camera
@@ -233,6 +233,7 @@ while True:
 
     key = cv2.waitKey(1)  # 1=readare automata // 0=redare la buton
     if key==ord('q'): #cv2.waitKey(1) & 0xFF == ord('q'):
+        capture.stop()
         if __ESTE_PE_MASINA__:
             serialHandler.sendBrake(0.0)
         break
@@ -243,5 +244,4 @@ if __ESTE_PE_MASINA__:
     serialHandler.close()
 
 #cap.release()
-cv2.destroyAllWindows()
-capture.stop()
+#cv2.destroyAllWindows()
